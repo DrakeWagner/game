@@ -4,6 +4,8 @@ import pygame
 from pygame.locals import *
 import sys
 import os
+import time
+import random
 
 os.chdir('C:\\Users\\dwagn\\git\\game')
 
@@ -16,13 +18,13 @@ ground_height = 325
 '''
 images
 '''
-image = pygame.image.load('player.png')
+image = pygame.image.load('player2.png')
 leftimage = pygame.transform.flip(image, True, False)
 
 fps_clock = pygame.time.Clock()
 
 displaysurface = pygame.display.set_mode((width, height))
-pygame.display.set_caption('Title')
+pygame.display.set_caption('PackRat: The Game')
 
 class Background(pygame.sprite.Sprite):
     def __init__(self):
@@ -100,7 +102,8 @@ class Player(pygame.sprite.Sprite):
 
     def asd(self):
         # jump testing
-        self.movey -= 50
+        if 330 > self.pos[1] > 325:
+            self.movey -= 50
 
     def move(self):
 
@@ -130,12 +133,29 @@ class Player(pygame.sprite.Sprite):
     def render(self):
         displaysurface.blit(self.image, self.pos)   
 
+class Ball(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load('ground.png')
+        self.rect = self.image.get_rect()
+        self.velocity = [random.randint(4,8),random.randint(-8,8)]
+        self.pos = (300, 300)
+
+    def update(self):
+        self.rect.x += self.velocity[0]
+        self.rect.y += self.velocity[1]
+
+
+    def render(self):
+        displaysurface.blit(self.image, self.pos)
+
 '''
 Setup class variables
 '''
 
 background = Background()
 ground = Ground()
+ball = Ball()
 player = Player(20, 300)
 player.rect.x = 0
 player.rect.y = 0
@@ -153,10 +173,14 @@ while running:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
+                player.isJump = True
                 player.asd()
                 # Start to jump by setting isJump to True.
-                player.isJump = True
+                player.isJump = False
             if event.key == ord('q'):
+                background.bgimage = pygame.image.load('virus_screen_1.png')
+                background.render()
+                time.sleep(.5)
                 pygame.quit()
                 sys.exit()
             if event.key == ord('a'):
@@ -187,8 +211,10 @@ while running:
     player.jump
     player.update()
     player.render()
-    fps_clock.tick(20)
+    fps_clock.tick(45)
 
-    print(player.isJump)
+    print(player.pos[1])
+
+    # ball.render()
 
     pygame.display.update()
